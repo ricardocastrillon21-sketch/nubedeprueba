@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pedidos de Pizza</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --card: #171a2b;
+      --accent: #00d8ff;
+      --text: #e8ecf1;
+      --muted: #9aa4b2;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --err: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(800px 400px at 10% 10%, #131634, var(--bg));
+      color: var(--text);
+    }
+    .container { max-width: 820px; margin: 40px auto; padding: 0 20px; }
+    .card {
+      background: linear-gradient(180deg, #191c30 0%, var(--card) 100%);
+      border: 1px solid #242946; border-radius: 14px; padding: 22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+    h1 { font-size: 1.8rem; margin: 0 0 14px; letter-spacing: 0.2px; }
+    p.subtitle { color: var(--muted); margin: 0 0 22px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full { grid-column: 1 / -1; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input[type="text"], input[type="email"], textarea, select {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #2b3056;
+      background: #121529; color: var(--text); outline: none; transition: border-color 0.2s;
+    }
+    textarea { min-height: 92px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      padding: 10px 14px; border-radius: 10px; border: 1px solid #2b3056; background: #14172c;
+      color: var(--text); cursor: pointer; transition: transform 0.02s ease, border-color 0.2s;
+      font-weight: 600;
+    }
+    .btn:hover { border-color: var(--accent); }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #0b132b; border-color: var(--accent); }
+    .status { font-size: 0.92rem; color: var(--muted); }
+    .pill { display:inline-block; padding: 6px 10px; border:1px solid #2b3056; border-radius:999px; background:#121529; color:var(--text); }
+    .checkbox-group { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; }
+    .summary {
+      margin-top: 16px; padding: 12px; border-radius: 10px; background: #121529; border: 1px solid #293056;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    .error { color: var(--err); font-size: 0.92rem; margin-top: 6px; }
+    .success { color: var(--ok); font-size: 0.92rem; margin-top: 6px; }
+    footer { color: var(--muted); text-align: center; margin-top: 20px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Pedido de Pizza</h1>
+      <p class="subtitle">Completa tus datos y elige tu pizza. Puedes capturar tu ubicación para facilitar la entrega.</p>
+
+      <form id="pizzaForm" novalidate>
+        <div class="grid">
+          <div class="full">
+            <label for="nombre">Nombre y apellidos</label>
+            <input id="nombre" name="nombre" type="text" placeholder="Ej: Orion Martínez" required />
+            <div class="error" data-error-for="nombre"></div>
+          </div>
+
+          <div class="full">
+            <label for="direccion">Dirección del pedido</label>
+            <textarea id="direccion" name="direccion" placeholder="Ej: Calle 5 # 10-20, Apto 302"></textarea>
+            <div class="error" data-error-for="direccion"></div>
+          </div>
+
+          <div>
+            <label for="barrio">Barrio</label>
+            <select id="barrio" name="barrio" required>
+              <option value="">Selecciona tu barrio</option>
+              <option>San Antonio</option>
+              <option>Granada</option>
+              <option>El Peñón</option>
+              <option>Ciudad Jardín</option>
+              <option>La Flora</option>
+              <option>Versalles</option>
+              <option>Otros</option>
+            </select>
+            <div class="error" data-error-for="barrio"></div>
+          </div>
+
+          <div>
+            <label for="tamano">Tamaño de la pizza</label>
+            <select id="tamano" name="tamano" required>
+              <option value="">Selecciona tamaño</option>
+              <option value="personal">Personal (20 cm)</option>
+              <option value="mediana">Mediana (30 cm)</option>
+              <option value="familiar">Familiar (40 cm)</option>
+              <option value="mega">Mega (50 cm)</option>
+            </select>
+            <div class="error" data-error-for="tamano"></div>
+          </div>
+
+          <div class="full">
+            <label>Sabores</label>
+            <div class="checkbox-group" id="sabores">
+              <label><input type="checkbox" value="Margarita" /> Margarita</label>
+              <label><input type="checkbox" value="Pepperoni" /> Pepperoni</label>
+              <label><input type="checkbox" value="Hawaiana" /> Hawaiana</label>
+              <label><input type="checkbox" value="Carnes" /> Carnes</label>
+              <label><input type="checkbox" value="Vegetariana" /> Vegetariana</label>
+              <label><input type="checkbox" value="Cuatro quesos" /> Cuatro quesos</label>
+              <label><input type="checkbox" value="BBQ" /> BBQ</label>
+              <label><input type="checkbox" value="Mexicana" /> Mexicana</label>
+              <label><input type="checkbox" value="Champiñones" /> Champiñones</label>
+            </div>
+            <div class="error" data-error-for="sabores"></div>
+          </div>
+
+          <div class="full">
+            <label>Ubicación</label>
+            <div class="row">
+              <button type="button" class="btn" id="btnUbicacion">Capturar ubicación (GPS)</button>
+              <span class="status" id="gpsStatus">Sin capturar</span>
+              <span class="pill" id="coordsPill" style="display:none;"></span>
+            </div>
+            <div class="error" data-error-for="gps"></div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 16px;">
+          <button type="button" class="btn" id="btnResumen">Ver resumen</button>
+          <button type="submit" class="btn btn-primary">Enviar pedido</button>
+        </div>
+
+        <div id="feedback" class="success" style="display:none;"></div>
+        <div id="summary" class="summary" style="display:none;"></div>
+      </form>
+    </div>
+
+    <footer>© 2025 Pizzería Cali — Pedidos rápidos y precisos</footer>
+  </div>
+
+  <script>
+    // Utilidades
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const setError = (name, msg) => {
+      const el = document.querySelector(\`.error[data-error-for="\${name}"]\`);
+      if (el) el.textContent = msg || "";
+    };
+
+    // Geolocalización
+    const btnUbicacion = $("#btnUbicacion");
+    const gpsStatus = $("#gpsStatus");
+    const coordsPill = $("#coordsPill");
+    let ubicacion = null;
+
+    btnUbicacion.addEventListener("click", () => {
+      setError("gps", "");
+      gpsStatus.textContent = "Capturando...";
+      if (!("geolocation" in navigator)) {
+        gpsStatus.textContent = "Geolocalización no disponible";
+        setError("gps", "Tu navegador no soporta geolocalización.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          ubicacion = { lat: latitude, lon: longitude, accuracy };
+          gpsStatus.textContent = "Ubicación capturada";
+          coordsPill.style.display = "inline-block";
+          coordsPill.textContent = \`Lat: \${latitude.toFixed(5)} | Lon: \${longitude.toFixed(5)} | ±\${Math.round(accuracy)} m\`;
+        },
+        (err) => {
+          gpsStatus.textContent = "No se pudo capturar";
+          setError("gps", "Permite el acceso al GPS y vuelve a intentar.");
+          console.error(err);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+
+    // Validación simple
+    function validate() {
+      let ok = true;
+      const nombre = $("#nombre").value.trim();
+      const barrio = $("#barrio").value.trim();
+      const tamano = $("#tamano").value.trim();
+      const sabores = $$("#sabores input[type='checkbox']:checked").map((i) => i.value);
+
+      setError("nombre", "");
+      setError("barrio", "");
+      setError("tamano", "");
+      setError("sabores", "");
+
+      if (nombre.length < 3) {
+        setError("nombre", "Ingresa tu nombre completo.");
+        ok = false;
+      }
+      if (!barrio) {
+        setError("barrio", "Selecciona tu barrio.");
+        ok = false;
+      }
+      if (!tamano) {
+        setError("tamano", "Selecciona el tamaño.");
+        ok = false;
+      }
+      if (sabores.length === 0) {
+        setError("sabores", "Elige al menos un sabor.");
+        ok = false;
+      }
+      return ok;
+    }
+
+    // Construir payload
+    function buildPayload() {
+      const payload = {
+        nombre: $("#nombre").value.trim(),
+        direccion: $("#direccion").value.trim(),
+        barrio: $("#barrio").value.trim(),
+        tamano: $("#tamano").value.trim(),
+        sabores: $$("#sabores input[type='checkbox']:checked").map((i) => i.value),
+        ubicacion: ubicacion, // { lat, lon, accuracy } o null
+        creadoEn: new Date().toISOString(),
+        origen: "web-form"
+      };
+      return payload;
+    }
+
+    // Resumen
+    $("#btnResumen").addEventListener("click", () => {
+      if (!validate()) {
+        $("#summary").style.display = "none";
+        return;
+      }
+      const data = buildPayload();
+      const resumen =
+        `Resumen del pedido:
+- Nombre: ${data.nombre}
+- Dirección: ${data.direccion || "No especificada"}
+- Barrio: ${data.barrio}
+- Tamaño: ${data.tamano}
+- Sabores: ${data.sabores.join(", ")}
+- Ubicación: ${data.ubicacion ? `Lat ${data.ubicacion.lat.toFixed(5)}, Lon ${data.ubicacion.lon.toFixed(5)} (±${Math.round(data.ubicacion.accuracy)} m)` : "No capturada"}
+- Timestamp: ${data.creadoEn}
+
+JSON:
+${JSON.stringify(data, null, 2)}
+`;
+      const summaryEl = $("#summary");
+      summaryEl.textContent = resumen;
+      summaryEl.style.display = "block";
+    });
+
+    // Envío (simulado)
+    $("#pizzaForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      $("#feedback").style.display = "none";
+      if (!validate()) return;
+
+      const data = buildPayload();
+
+      // Simula envío HTTP
+      try {
+        // Ejemplo: await fetch("/api/pedidos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        await new Promise((res) => setTimeout(res, 600)); // simulación
+        const fb = $("#feedback");
+        fb.textContent = "Pedido enviado correctamente. ¡Gracias!";
+        fb.className = "success";
+        fb.style.display = "block";
+      } catch (err) {
+        const fb = $("#feedback");
+        fb.textContent = "Error al enviar el pedido. Intenta nuevamente.";
+        fb.className = "error";
+        fb.style.display = "block";
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
